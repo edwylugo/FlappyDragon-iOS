@@ -9,39 +9,40 @@
 import UIKit
 import SpriteKit
 import GameplayKit
+import AVKit
+
 
 class GameViewController: UIViewController {
+    
+    var stage: SKView!
+    var musicPlayer: AVAudioPlayer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let view = self.view as! SKView? {
-            // Load the SKScene from 'GameScene.sks'
-            if let scene = SKScene(fileNamed: "GameScene") {
-                // Set the scale mode to scale to fit the window
-                scene.scaleMode = .aspectFill
-                
-                // Present the scene
-                view.presentScene(scene)
-            }
-            
-            view.ignoresSiblingOrder = true
-            
-            view.showsFPS = true
-            view.showsNodeCount = true
-        }
+        stage = view as! SKView //monta o palco
+        stage.ignoresSiblingOrder = true // Deixa que eu ordeno os objetos um na frente do outro
+        
+        presentScene() //Mostra a cena do jogo
+        playMusic()
+        
     }
-
-    override var shouldAutorotate: Bool {
-        return true
-    }
-
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            return .allButUpsideDown
-        } else {
-            return .all
+    
+    func playMusic() {
+        if let musicURL = Bundle.main.url(forResource: "music", withExtension: "m4a") {
+            musicPlayer = try! AVAudioPlayer(contentsOf: musicURL)
+            musicPlayer.numberOfLoops = -1
+            musicPlayer.volume = 0.4
+            musicPlayer.play()
         }
+        
+    }
+    
+    func presentScene() {
+        let scene = GameScene(size: CGSize(width: 320, height: 568))
+        scene.gameViewController = self
+        scene.scaleMode = .aspectFill
+        stage.presentScene(scene, transition: .doorsOpenVertical(withDuration: 0.2))
     }
 
     override var prefersStatusBarHidden: Bool {
